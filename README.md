@@ -195,6 +195,7 @@ The key set therefore **varies by model**. Consumers must not assume a fixed set
 | `analog_c` | Analog current input (4–20 mA) | Board has a 4–20 mA input |
 | `pwr_in` | Power input rail | Model code position 2 is `P` |
 | `pwr_out` | Power output rail | Board supplies power to an external sensor |
+| `led_test` | Status / indicator LED | Board has an indicator LED |
 | `capacitor_charge` | Supercapacitor / storage charge circuit | Model code position 2 is `B` |
 | `3volt_out` | 3 V rail output | Always — every board has this rail |
 
