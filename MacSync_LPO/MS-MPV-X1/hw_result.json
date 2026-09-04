@@ -1,4 +1,11 @@
 {
+  "firmware": {
+    "application": [
+      "Application/NrF52810/BLE-MS-MPV-X1.hex",
+      "Application/STM32WLE5CBU6/MS-MPV-X1.hex"
+    ],
+    "testing": []
+  },
   "hw_result": {
     "i2c": true,
     "rs485": false,

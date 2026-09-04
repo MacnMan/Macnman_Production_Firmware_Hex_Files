@@ -36,32 +36,45 @@ Worked example — `MacSync-LBD-STD-X1`: LoRaWAN, Battery powered, Datalogger, S
 
 ```
 Macnman_Production_Firmware_Hex_Files/
-├── MacSync_LBO/                          # LoRa, Battery Operated
+├── MacSync_LBO/                              # LoRa, Battery Operated
 │   ├── MacSync_MBS_TH_X1/
-│   │   ├── NrF52/                        # BLE build
-│   │   │   ├── BLE-MS-MBS-TH-X1.hex
-│   │   │   └── hw_result.json
-│   │   └── STM32WLE5CBU6/                # LoRa build
-│   │       ├── MS-MBS-TH-X1.hex
-│   │       └── hw_result.json
-│   ├── MacSync_MBS_DRS_X1/
-│   │   ├── NrF52/
-│   │   │   ├── BLE-MS-MBS-DRS-X1.hex
-│   │   │   └── hw_result.json
-│   │   └── STM32WLE5CBU6/
-│   │       ├── MS-MBS-DRS-X1.hex
-│   │       └── hw_result.json
-│   └── MS-MPV-X1/
-│       ├── NrF52810/
-│       │   ├── BLE-MS-MPV-X1.hex
-│       │   └── hw_result.json
-│       └── STM32WLE5CBU6/
-│           ├── MS-MPV-X1.hex
-│           └── hw_result.json
-└── MacSync_LPO/                          # LoRa, Power Operated
+│   │   ├── hw_result.json                    # one per model
+│   │   ├── Application/                      # shipping firmware
+│   │   │   ├── NrF52/
+│   │   │   │   └── BLE-MS-MBS-TH-X1.hex
+│   │   │   └── STM32WLE5CBU6/
+│   │   │       └── MS-MBS-TH-X1.hex
+│   │   └── Testing/                          # JIG test firmware
+│   │       ├── NrF52/
+│   │       │   └── nRF52810_JIG_Testing.hex
+│   │       └── STM32WLE5CBU6/
+│   │           └── LoRa__Jig_Boards_Testing_final.hex
+│   └── MacSync_MBS_DRS_X1/
+│       ├── hw_result.json
+│       ├── Application/
+│       │   ├── NrF52810/
+│       │   │   └── BLE-MS-MBS-DRS-X1.hex
+│       │   └── STM32WLE5CBU6/
+│       │       └── MS-MBS-DRS-X1.hex
+│       └── Testing/
+│           ├── NrF52/
+│           │   └── nRF52810_JIG_Testing.hex
+│           └── STM32WLE5CBU6/
+│               └── LoRa__Jig_Boards_Testing_final.hex
+└── MacSync_LPO/                              # LoRa, Power Operated
+    └── MS-MPV-X1/
+        ├── hw_result.json
+        ├── Application/
+        │   ├── NrF52810/
+        │   │   └── BLE-MS-MPV-X1.hex
+        │   └── STM32WLE5CBU6/
+        │       └── MS-MPV-X1.hex
+        └── Testing/                          # empty — no JIG firmware yet
+            ├── NrF52/
+            └── STM32WLE5CBU6/
 ```
 
-Within a device folder, firmware is separated by target MCU:
+Within each stage folder, firmware is separated by target MCU:
 
 | MCU folder | Silicon | Radio | Hex file prefix |
 | --- | --- | --- | --- |
@@ -71,53 +84,62 @@ Within a device folder, firmware is separated by target MCU:
 
 ### Folder structure convention
 
-Every file in this repository sits at a three-level path:
+Firmware sits at a four-level path:
 
 ```
-<power-class>/<model>/<mcu>/
-        |         |      |
-        |         |      +-- MCU the build targets, e.g. NrF52, STM32WLE5CBU6
-        |         +--------- device model folder, e.g. MacSync_MBS_TH_X1
-        +------------------- MacSync_LBO (battery) or MacSync_LPO (externally powered)
+<power-class>/<model>/<stage>/<mcu>/
+        |         |       |      |
+        |         |       |      +-- MCU the build targets, e.g. NrF52810, STM32WLE5CBU6
+        |         |       +--------- Application or Testing
+        |         +----------------- device model folder, e.g. MacSync_MBS_TH_X1
+        +--------------------------- MacSync_LBO (battery) or MacSync_LPO (externally powered)
 ```
 
 | Level | Rule |
 | --- | --- |
 | `<power-class>` | Determined by **position 2** of the model code: `B` → `MacSync_LBO`, `P` → `MacSync_LPO`. Never create a third top-level folder. |
 | `<model>` | One folder per device model, named as the model number with `_` separators (e.g. `MacSync_MBS_TH_X1`). One model per folder — do not place another model's firmware here. |
+| `<stage>` | `Application` for the production firmware the device ships with; `Testing` for the JIG firmware used to bring the board up on the test fixture. |
 | `<mcu>` | One folder per target MCU. A device with two MCUs (radio + application) gets one folder each. |
 
-Each `<mcu>` folder contains, and contains only:
+Each `<mcu>` folder contains only `.hex` firmware images, named per the [file naming convention](#file-naming-convention).
 
-- one or more `.hex` firmware images, named per the [file naming convention](#file-naming-convention);
-- exactly one `hw_result.json` recording the hardware test outcome for that build.
+**Exactly one `hw_result.json` per model**, at the model folder root — the level that holds `Application/` and `Testing/`. There is no `hw_result.json` inside the stage or MCU folders.
 
 #### Adding a new device
 
 1. Decode the model number to pick the power class — `B` → `MacSync_LBO`, `P` → `MacSync_LPO`.
 2. Create `<power-class>/<model>/` using the model number with `_` separators.
-3. Create one `<mcu>/` folder beneath it per target MCU.
-4. Add the `.hex` file(s) to each MCU folder.
-5. **Add an `hw_result.json` to each MCU folder listing exactly the tests that model requires** — see [Rule: list only the tests that model requires](#rule-list-only-the-tests-that-model-requires). Never copy another model's file across unchanged.
+3. Create `Application/` and `Testing/` beneath it, and one `<mcu>/` folder inside each per target MCU.
+4. Put the shipping `.hex` in `Application/<mcu>/` and the JIG test `.hex` in `Testing/<mcu>/`.
+5. **Add one `hw_result.json` at the model folder root.** List every `.hex` under `firmware`, and include exactly the tests this model requires — see [Rule: list only the tests that model requires](#rule-list-only-the-tests-that-model-requires). Never copy another model's file across unchanged.
 
 Folders are only visible on GitHub once they contain a committed file — an empty folder will not appear.
 
 #### Current deviations
 
-Each model now has its own folder, as required. Three points remain open — see [Naming exceptions to resolve](#naming-exceptions-to-resolve) for detail:
+Each model has its own folder, and `MS-MPV-X1` sits under `MacSync_LPO` as its `P` code requires. Three points remain open — see [Naming exceptions to resolve](#naming-exceptions-to-resolve) for detail:
 
 - **`MS-MPV-X1/` is named inconsistently with its siblings.** The other model folders use the full family name with underscores (`MacSync_MBS_TH_X1`); this one uses the abbreviated, hyphenated file-name form. It should be `MacSync_MPV_X1/`.
-- **`MS-MPV-X1` is a `P` (externally powered) model filed under `MacSync_LBO`** (battery). It belongs under `MacSync_LPO` if the model code is correct.
-- **`MacSync_LPO/` is empty**, so it does not currently appear on GitHub.
-
-MCU folders are named after the silicon. `NrF52810` names an exact part number while `NrF52` names the family; picking one convention and applying it to both would keep paths predictable.
+- **`MS-MPV-X1/Testing/` is empty** — no JIG firmware for either MCU, so neither `Testing` folder appears on GitHub and its `hw_result.json` lists an empty `testing` array.
+- **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` uses `NrF52` while the other two models use `NrF52810`, and every `Testing/` folder is named `NrF52` despite holding `nRF52810_JIG_Testing.hex`. Pick either the exact part number or the family and apply it everywhere.
 
 ## Hardware test results
 
-Each MCU folder carries an `hw_result.json` recording the outcome of the hardware bring-up tests for that build. Every field is a boolean: `true` = pass, `false` = fail.
+Each model folder carries exactly one `hw_result.json`, recording the firmware it holds and the outcome of the JIG hardware tests. Every test field is a boolean: `true` = pass, `false` = fail.
 
 ```json
 {
+  "firmware": {
+    "application": [
+      "Application/NrF52/BLE-MS-MBS-TH-X1.hex",
+      "Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex"
+    ],
+    "testing": [
+      "Testing/NrF52/nRF52810_JIG_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa__Jig_Boards_Testing_final.hex"
+    ]
+  },
   "hw_result": {
     "i2c": true,
     "3volt_out": true,
@@ -126,6 +148,19 @@ Each MCU folder carries an `hw_result.json` recording the outcome of the hardwar
   }
 }
 ```
+
+### The firmware field
+
+`firmware` lists every `.hex` present under the model folder, split by stage, as paths relative to the model folder itself.
+
+| Key | Contents |
+| --- | --- |
+| `application` | Every `.hex` under `Application/`, across all MCU folders. |
+| `testing` | Every `.hex` under `Testing/`. Empty array when no JIG firmware exists yet. |
+
+The model number is deliberately **not** stored in the file — it is already the name of the folder the file sits in, and duplicating it only creates a second place to get it wrong.
+
+Update these lists whenever firmware is added to or removed from the model folder, so they never drift from what is actually on disk.
 
 ### Rule: list only the tests that model requires
 
@@ -173,12 +208,14 @@ The rest depend on what is fitted to the board — confirm against the schematic
 }
 ```
 
-### The six current files do not follow this rule
+### The current files do not follow this rule
 
-Every `hw_result.json` in the repository today is an identical copy of the same ten-field sample. They must each be replaced with that board's real required set and real measured values. Two are provably wrong as they stand:
+The `firmware` lists are correct — they are generated from the folder contents. The `hw_result` block is not: all three files carry the same ten-field sample. Each must be replaced with that board's real required key set and real measured values. Two problems are provable as they stand:
 
-- **Both BLE folders claim `lora_rf`.** `NrF52/` and `NrF52810/` hold Bluetooth images; there is no LoRa radio to test. A BLE radio test field is needed instead — the catalogue above has no name for one yet.
-- **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board, and **`MS-MPV-X1` also claims `rs485: false`** though its firmware reports `DEVINFO=LORA,NODE,RS485,…` and it certainly does have RS485.
+- **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board. The key should be absent, not `false`.
+- **`MS-MPV-X1` claims `rs485: false`** though its firmware reports `DEVINFO=LORA,NODE,RS485,…`. It has RS485, so the test should be present and its real result recorded.
+
+Note also that each model builds for a BLE MCU as well as a LoRa one, but there is a single `hw_result` block per model and no BLE radio test in the catalogue. If the JIG tests the two MCUs separately, the file needs a way to express that.
 
 Fetch a result directly over raw HTTP:
 
@@ -196,12 +233,12 @@ https://raw.githubusercontent.com/MacnMan/Macnman_Production_Firmware_Hex_Files/
 
 | Model | Decoded | Interface | Application | Hex file |
 | --- | --- | --- | --- | --- |
-| `MacSync-MBS-TH-X1` | raw LoRa · Battery · Sensor · TH · X1 | I2C (SHT40) | V1.1.0 | [MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/STM32WLE5CBU6/MS-MBS-TH-X1.hex) |
-| `MacSync-MBS-DRS-X1` | raw LoRa · Battery · Sensor · DRS · X1 | Digital (door reed) | V1.1.0 | [MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/STM32WLE5CBU6/MS-MBS-DRS-X1.hex) |
-| `MacSync-MPV-X1` | does not parse — see below | RS485 | V1.3.0 | [MS-MPV-X1.hex](MacSync_LBO/MS-MPV-X1/STM32WLE5CBU6/MS-MPV-X1.hex) |
-| `MacSync-MBS-TH-X1` (BLE build) | BLE build of an `M`-coded model | I2C (SHT40) | _unconfirmed_ | [BLE-MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/NrF52/BLE-MS-MBS-TH-X1.hex) |
-| `MacSync-MBS-DRS-X1` (BLE build) | BLE build of an `M`-coded model | Digital (door reed) | _unconfirmed_ | [BLE-MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/NrF52/BLE-MS-MBS-DRS-X1.hex) |
-| `MacSync-MPV-X1` (BLE build) | does not parse — see below | RS485 | _unconfirmed_ | [BLE-MS-MPV-X1.hex](MacSync_LBO/MS-MPV-X1/NrF52810/BLE-MS-MPV-X1.hex) |
+| `MacSync-MBS-TH-X1` | raw LoRa · Battery · Sensor · TH · X1 | I2C (SHT40) | V1.1.0 | [MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex) |
+| `MacSync-MBS-DRS-X1` | raw LoRa · Battery · Sensor · DRS · X1 | Digital (door reed) | V1.1.0 | [MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/STM32WLE5CBU6/MS-MBS-DRS-X1.hex) |
+| `MacSync-MPV-X1` | does not parse — see below | RS485 | V1.3.0 | [MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/STM32WLE5CBU6/MS-MPV-X1.hex) |
+| `MacSync-MBS-TH-X1` (BLE build) | BLE build of an `M`-coded model | I2C (SHT40) | _unconfirmed_ | [BLE-MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/NrF52/BLE-MS-MBS-TH-X1.hex) |
+| `MacSync-MBS-DRS-X1` (BLE build) | BLE build of an `M`-coded model | Digital (door reed) | _unconfirmed_ | [BLE-MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/NrF52810/BLE-MS-MBS-DRS-X1.hex) |
+| `MacSync-MPV-X1` (BLE build) | does not parse — see below | RS485 | _unconfirmed_ | [BLE-MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/NrF52810/BLE-MS-MPV-X1.hex) |
 
 Application versions for the LoRa builds are the values reported by the firmware's own `DEVINFO` record. The nRF52 BLE builds embed no version string, so their versions are unconfirmed.
 
