@@ -1,0 +1,10 @@
+# Firmware images are release artifacts: store and serve them byte-exact.
+# Without this, Git line-ending normalization would rewrite CRLF -> LF and
+# change the checksum of every .hex delivered over raw.githubusercontent.com.
+*.hex -text
+*.bin -text
+*.png -text
+
+# Docs and metadata normalize normally.
+*.md   text
+*.json text
