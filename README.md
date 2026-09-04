@@ -97,7 +97,8 @@ Each `<mcu>` folder contains, and contains only:
 1. Decode the model number to pick the power class — `B` → `MacSync_LBO`, `P` → `MacSync_LPO`.
 2. Create `<power-class>/<model>/` using the model number with `_` separators.
 3. Create one `<mcu>/` folder beneath it per target MCU.
-4. Add the `.hex` file(s) and an `hw_result.json` to each MCU folder.
+4. Add the `.hex` file(s) to each MCU folder.
+5. **Add an `hw_result.json` to each MCU folder listing exactly the tests that model requires** — see [Rule: list only the tests that model requires](#rule-list-only-the-tests-that-model-requires). Never copy another model's file across unchanged.
 
 Folders are only visible on GitHub once they contain a committed file — an empty folder will not appear.
 
@@ -119,33 +120,65 @@ Each MCU folder carries an `hw_result.json` recording the outcome of the hardwar
 {
   "hw_result": {
     "i2c": true,
-    "rs485": false,
-    "relay_test": false,
-    "analog_v": false,
-    "analog_c": false,
     "3volt_out": true,
-    "pwr_out": false,
-    "pwr_in": false,
     "capacitor_charge": true,
     "lora_rf": true
   }
 }
 ```
 
-| Field | Test |
-| --- | --- |
-| `i2c` | I2C bus communication (e.g. SHT40 sensor) |
-| `rs485` | RS485 / Modbus transceiver |
-| `relay_test` | Relay switching output |
-| `analog_v` | Analog voltage input |
-| `analog_c` | Analog current input (4–20 mA) |
-| `3volt_out` | 3 V rail output |
-| `pwr_out` | Power output rail |
-| `pwr_in` | Power input rail |
-| `capacitor_charge` | Supercapacitor / storage charge circuit |
-| `lora_rf` | LoRa RF transmit / receive |
+### Rule: list only the tests that model requires
 
-A field that does not apply to a given board should still be present, set to `false`, so the key set stays uniform across devices.
+**`hw_result.json` contains one entry per test the board actually has — and nothing else.**
+
+Do not pad the file with tests the hardware does not implement. A `false` must always mean *this test ran and failed*. If absent keys were written as `false`, a genuine failure would be indistinguishable from a test that was never applicable, and the file stops being a usable QA record.
+
+The key set therefore **varies by model**. Consumers must not assume a fixed set of keys — read whichever keys are present, and treat a missing key as "not applicable to this board".
+
+### Test catalogue
+
+| Field | Test | Required when |
+| --- | --- | --- |
+| `lora_rf` | LoRa RF transmit / receive | Model code position 1 is `L` or `M` |
+| `i2c` | I2C bus communication (e.g. SHT40) | Board carries an I2C sensor |
+| `rs485` | RS485 / Modbus transceiver | Interface is RS485 |
+| `relay_test` | Relay switching output | Board has a relay output |
+| `analog_v` | Analog voltage input | Board has an analog voltage input |
+| `analog_c` | Analog current input (4–20 mA) | Board has a 4–20 mA input |
+| `pwr_in` | Power input rail | Model code position 2 is `P` |
+| `pwr_out` | Power output rail | Board supplies power to an external sensor |
+| `capacitor_charge` | Supercapacitor / storage charge circuit | Model code position 2 is `B` |
+| `3volt_out` | 3 V rail output | Always — every board has this rail |
+
+Three of these are decided by the model number alone, so they need no judgement:
+
+- position 1 `L`/`M` → include `lora_rf`
+- position 2 `B` → include `capacitor_charge`
+- position 2 `P` → include `pwr_in`
+
+The rest depend on what is fitted to the board — confirm against the schematic, not the model number.
+
+### Worked example
+
+`MacSync-MBS-TH-X1` decodes to raw LoRa · Battery · Sensor · TH, on an I2C SHT40. Required tests: `lora_rf` (M), `capacitor_charge` (B), `i2c` (SHT40 fitted), `3volt_out` (always). It has no RS485, no relay and no analog inputs, so those five keys are omitted entirely:
+
+```json
+{
+  "hw_result": {
+    "lora_rf": true,
+    "capacitor_charge": true,
+    "i2c": true,
+    "3volt_out": true
+  }
+}
+```
+
+### The six current files do not follow this rule
+
+Every `hw_result.json` in the repository today is an identical copy of the same ten-field sample. They must each be replaced with that board's real required set and real measured values. Two are provably wrong as they stand:
+
+- **Both BLE folders claim `lora_rf`.** `NrF52/` and `NrF52810/` hold Bluetooth images; there is no LoRa radio to test. A BLE radio test field is needed instead — the catalogue above has no name for one yet.
+- **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board, and **`MS-MPV-X1` also claims `rs485: false`** though its firmware reports `DEVINFO=LORA,NODE,RS485,…` and it certainly does have RS485.
 
 Fetch a result directly over raw HTTP:
 
@@ -193,8 +226,8 @@ Hex files are named for the model, not the version:
 
 1. Place the `.hex` file in the matching `<device>/<MCU>/` folder.
 2. Name it using the convention above.
-3. Add or update `hw_result.json` in that folder with the hardware test outcome for the build.
-4. Validate the JSON parses.
+3. **Add or update `hw_result.json` in that folder.** This step is mandatory for every new model number — derive the required key set from the model code and the board, per [Rule: list only the tests that model requires](#rule-list-only-the-tests-that-model-requires), and record real measured values. A new model must never inherit another model's file unchanged.
+4. Validate the JSON parses and that its key set matches the tests that model actually has.
 5. Commit with a message stating the model and version, e.g. `Add MacSync-MPV-X1 firmware V1.3.0`.
 6. Add a row to the release notes below.
 
