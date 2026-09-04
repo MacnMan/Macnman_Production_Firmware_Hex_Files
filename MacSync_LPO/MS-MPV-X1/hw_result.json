@@ -4,7 +4,10 @@
       "Application/NrF52810/BLE-MS-MPV-X1.hex",
       "Application/STM32WLE5CBU6/MS-MPV-X1.hex"
     ],
-    "testing": []
+    "testing": [
+      "Testing/NrF52/nRF52810_JIG_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa__Jig_Boards_Testing_final.hex"
+    ]
   },
   "hw_result": {
     "i2c": false,

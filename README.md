@@ -45,10 +45,10 @@ Macnman_Production_Firmware_Hex_Files/
 │   │   │   └── STM32WLE5CBU6/
 │   │   │       └── MS-MBS-TH-X1.hex
 │   │   └── Testing/                          # JIG test firmware
-│   │       ├── NrF52/
+│   │       ├── NrF52810/
 │   │       │   └── nRF52810_JIG_Testing.hex
 │   │       └── STM32WLE5CBU6/
-│   │           └── LoRa__Jig_Boards_Testing_final.hex
+│   │           └── LoRa_Jig_Testing_SHT40_Sensor.hex
 │   └── MacSync_MBS_DRS_X1/
 │       ├── hw_result.json
 │       ├── Application/
@@ -57,10 +57,10 @@ Macnman_Production_Firmware_Hex_Files/
 │       │   └── STM32WLE5CBU6/
 │       │       └── MS-MBS-DRS-X1.hex
 │       └── Testing/
-│           ├── NrF52/
+│           ├── NrF52810/
 │           │   └── nRF52810_JIG_Testing.hex
 │           └── STM32WLE5CBU6/
-│               └── LoRa__Jig_Boards_Testing_final.hex
+│               └── LoRa_Jig_Testing_SHT40_Sensor.hex
 └── MacSync_LPO/                              # LoRa, Power Operated
     └── MS-MPV-X1/
         ├── hw_result.json
@@ -69,9 +69,11 @@ Macnman_Production_Firmware_Hex_Files/
         │   │   └── BLE-MS-MPV-X1.hex
         │   └── STM32WLE5CBU6/
         │       └── MS-MPV-X1.hex
-        └── Testing/                          # empty — no JIG firmware yet
+        └── Testing/
             ├── NrF52/
+            │   └── nRF52810_JIG_Testing.hex
             └── STM32WLE5CBU6/
+                └── LoRa__Jig_Boards_Testing_final.hex
 ```
 
 Within each stage folder, firmware is separated by target MCU:
@@ -121,8 +123,8 @@ Folders are only visible on GitHub once they contain a committed file — an emp
 Each model has its own folder, and `MS-MPV-X1` sits under `MacSync_LPO` as its `P` code requires. Three points remain open — see [Naming exceptions to resolve](#naming-exceptions-to-resolve) for detail:
 
 - **`MS-MPV-X1/` is named inconsistently with its siblings.** The other model folders use the full family name with underscores (`MacSync_MBS_TH_X1`); this one uses the abbreviated, hyphenated file-name form. It should be `MacSync_MPV_X1/`.
-- **`MS-MPV-X1/Testing/` is empty** — no JIG firmware for either MCU, so neither `Testing` folder appears on GitHub and its `hw_result.json` lists an empty `testing` array.
-- **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` uses `NrF52` while the other two models use `NrF52810`, and every `Testing/` folder is named `NrF52` despite holding `nRF52810_JIG_Testing.hex`. Pick either the exact part number or the family and apply it everywhere.
+- **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` and `MS-MPV-X1/Testing/` use `NrF52`, while everywhere else uses `NrF52810` — including folders holding the same `nRF52810_JIG_Testing.hex`. Pick either the exact part number or the family and apply it everywhere.
+- **`MS-MPV-X1` carries older JIG firmware than the other two models.** It still holds `LoRa__Jig_Boards_Testing_final.hex` and the earlier `nRF52810_JIG_Testing.hex`, where `MacSync_MBS_TH_X1` and `MacSync_MBS_DRS_X1` have moved to `LoRa_Jig_Testing_SHT40_Sensor.hex` and a newer nRF build. Confirm whether MPV should be updated too.
 
 ## Hardware test results
 
@@ -136,8 +138,8 @@ Each model folder carries exactly one `hw_result.json`, recording the firmware i
       "Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex"
     ],
     "testing": [
-      "Testing/NrF52/nRF52810_JIG_Testing.hex",
-      "Testing/STM32WLE5CBU6/LoRa__Jig_Boards_Testing_final.hex"
+      "Testing/NrF52810/nRF52810_JIG_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa_Jig_Testing_SHT40_Sensor.hex"
     ]
   },
   "hw_result": {
@@ -160,7 +162,18 @@ Each model folder carries exactly one `hw_result.json`, recording the firmware i
 
 The model number is deliberately **not** stored in the file — it is already the name of the folder the file sits in, and duplicating it only creates a second place to get it wrong.
 
-Update these lists whenever firmware is added to or removed from the model folder, so they never drift from what is actually on disk.
+#### Keeping the lists in sync
+
+**Nothing updates these lists automatically.** Git tracks the `.hex` files and the JSON as unrelated blobs; it has no idea the JSON quotes those paths. Rename an MCU folder or swap in a differently-named build, and the commit succeeds while the JSON silently keeps pointing at a file that no longer exists.
+
+Run the helper after any firmware change, before committing:
+
+```bash
+./tools/update_firmware_lists.sh            # rewrite the lists from disk
+./tools/update_firmware_lists.sh --check    # report only; exit 1 if stale
+```
+
+It rebuilds only the `firmware` block and leaves `hw_result` untouched. The `--check` form is safe to wire into a pre-commit hook or CI job so a stale list fails loudly instead of shipping.
 
 ### Rule: list only the tests that model requires
 

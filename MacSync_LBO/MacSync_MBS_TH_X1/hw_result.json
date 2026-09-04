@@ -5,8 +5,8 @@
       "Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex"
     ],
     "testing": [
-      "Testing/NrF52/nRF52810_JIG_Testing.hex",
-      "Testing/STM32WLE5CBU6/LoRa__Jig_Boards_Testing_final.hex"
+      "Testing/NrF52810/nRF52810_JIG_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa_Jig_Testing_SHT40_Sensor.hex"
     ]
   },
   "hw_result": {
