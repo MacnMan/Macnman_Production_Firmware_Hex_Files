@@ -7,15 +7,15 @@
     "testing": []
   },
   "hw_result": {
-    "i2c": true,
-    "rs485": false,
+    "i2c": false,
+    "rs485": true,
     "relay_test": false,
     "analog_v": false,
     "analog_c": false,
-    "3volt_out": true,
+    "3volt_out": false,
     "pwr_out": false,
-    "pwr_in": false,
-    "capacitor_charge": true,
+    "pwr_in": true,
+    "capacitor_charge": false,
     "lora_rf": true
   }
 }
