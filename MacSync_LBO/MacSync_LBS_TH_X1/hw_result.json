@@ -1,0 +1,25 @@
+{
+  "firmware": {
+    "application": [
+      "Application/NrF52/BLE-MS-MBS-TH-X1.hex",
+      "Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex"
+    ],
+    "testing": [
+      "Testing/NrF52810/nRF52810_JIG_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa_Jig_Testing_SHT40_Sensor.hex"
+    ]
+  },
+  "hw_result": {
+    "i2c": true,
+    "rs485": false,
+    "relay_test": false,
+    "analog_v": false,
+    "analog_c": false,
+    "3volt_out": true,
+    "pwr_out": false,
+    "pwr_in": false,
+    "led_test": true,
+    "capacitor_charge": true,
+    "lora_rf": true
+  }
+}
