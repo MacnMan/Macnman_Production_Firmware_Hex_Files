@@ -37,6 +37,18 @@ Worked example — `MacSync-LBD-STD-X1`: LoRaWAN, Battery powered, Datalogger, S
 ```
 Macnman_Production_Firmware_Hex_Files/
 ├── MacSync_LBO/                              # LoRa, Battery Operated
+│   ├── MacSync_LBS_TH_X1/                    # LoRaWAN build
+│   │   ├── hw_result.json
+│   │   ├── Application/
+│   │   │   ├── NrF52810/
+│   │   │   │   └── BLE_MS-LBS-TH-X1.hex
+│   │   │   └── STM32WLE5CBU6/
+│   │   │       └── MacSync_LBS_TH_X1.hex
+│   │   └── Testing/
+│   │       ├── NrF52810/
+│   │       │   └── nRF52810_JIG_Testing.hex
+│   │       └── STM32WLE5CBU6/
+│   │           └── LoRa_Jig_Testing_SHT40_Sensor.hex
 │   ├── MacSync_MBS_TH_X1/
 │   │   ├── hw_result.json                    # one per model
 │   │   ├── Application/                      # shipping firmware
@@ -124,7 +136,8 @@ Each model has its own folder, and `MS-MPV-X1` sits under `MacSync_LPO` as its `
 
 - **`MS-MPV-X1/` is named inconsistently with its siblings.** The other model folders use the full family name with underscores (`MacSync_MBS_TH_X1`); this one uses the abbreviated, hyphenated file-name form. It should be `MacSync_MPV_X1/`.
 - **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` and `MS-MPV-X1/Testing/` use `NrF52`, while everywhere else uses `NrF52810` — including folders holding the same `nRF52810_JIG_Testing.hex`. Pick either the exact part number or the family and apply it everywhere.
-- **`MS-MPV-X1` carries older JIG firmware than the other two models.** It still holds `LoRa__Jig_Boards_Testing_final.hex` and the earlier `nRF52810_JIG_Testing.hex`, where `MacSync_MBS_TH_X1` and `MacSync_MBS_DRS_X1` have moved to `LoRa_Jig_Testing_SHT40_Sensor.hex` and a newer nRF build. Confirm whether MPV should be updated too.
+- **`MS-MPV-X1` carries older JIG firmware than the other models.** It still holds `LoRa__Jig_Boards_Testing_final.hex` and the earlier `nRF52810_JIG_Testing.hex`, where the others have moved to `LoRa_Jig_Testing_SHT40_Sensor.hex` and a newer nRF build. Confirm whether MPV should be updated too.
+- **`MacSync_LBS_TH_X1` hex files do not follow the naming convention.** `BLE_MS-LBS-TH-X1.hex` uses an underscore where the convention has a hyphen (`BLE-MS-…`), and `MacSync_LBS_TH_X1.hex` spells out the family with underscores instead of the `MS-LBS-TH-X1.hex` form used by every other model. See [file naming convention](#file-naming-convention).
 
 ## Hardware test results
 
@@ -247,6 +260,7 @@ https://raw.githubusercontent.com/MacnMan/Macnman_Production_Firmware_Hex_Files/
 
 | Model | Decoded | Interface | Application | Hex file |
 | --- | --- | --- | --- | --- |
+| `MacSync-LBS-TH-X1` | LoRaWAN · Battery · Sensor · TH · X1 | I2C (SHT40) | V1.0.0 | [MacSync_LBS_TH_X1.hex](MacSync_LBO/MacSync_LBS_TH_X1/Application/STM32WLE5CBU6/MacSync_LBS_TH_X1.hex) |
 | `MacSync-MBS-TH-X1` | raw LoRa · Battery · Sensor · TH · X1 | I2C (SHT40) | V1.1.0 | [MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex) |
 | `MacSync-MBS-DRS-X1` | raw LoRa · Battery · Sensor · DRS · X1 | Digital (door reed) | V1.1.0 | [MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/STM32WLE5CBU6/MS-MBS-DRS-X1.hex) |
 | `MacSync-MPV-X1` | does not parse — see below | RS485 | V1.3.0 | [MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/STM32WLE5CBU6/MS-MPV-X1.hex) |

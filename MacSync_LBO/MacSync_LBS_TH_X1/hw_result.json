@@ -1,8 +1,8 @@
 {
   "firmware": {
     "application": [
-      "Application/NrF52/BLE-MS-MBS-TH-X1.hex",
-      "Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex"
+      "Application/NrF52810/BLE_MS-LBS-TH-X1.hex",
+      "Application/STM32WLE5CBU6/MacSync_LBS_TH_X1.hex"
     ],
     "testing": [
       "Testing/NrF52810/nRF52810_JIG_Testing.hex",
