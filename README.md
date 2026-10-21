@@ -74,6 +74,13 @@ Macnman_Production_Firmware_Hex_Files/
 │           └── STM32WLE5CBU6/
 │               └── LoRa_Jig_Testing_SHT40_Sensor.hex
 └── MacSync_LPO/                              # LoRa, Power Operated
+    ├── MacSync_LPS_STD_X1/                   # LoRaWAN build, RS485 + analog
+    │   ├── hw_result.json
+    │   └── Application/
+    │       ├── NrF52810/
+    │       │   └── BLE-MS-LPS-STD-X1.hex
+    │       └── STM32WLE5CBU6/
+    │           └── MS-LPS-STD-X1.hex
     └── MS-MPV-X1/
         ├── hw_result.json
         ├── Application/
@@ -87,6 +94,8 @@ Macnman_Production_Firmware_Hex_Files/
             └── STM32WLE5CBU6/
                 └── LoRa__Jig_Boards_Testing_final.hex
 ```
+
+`MacSync_LPS_STD_X1` has no `Testing/` folder yet: no JIG firmware has been assigned to this board.
 
 Within each stage folder, firmware is separated by target MCU:
 
@@ -264,9 +273,11 @@ https://raw.githubusercontent.com/MacnMan/Macnman_Production_Firmware_Hex_Files/
 | `MacSync-MBS-TH-X1` | raw LoRa · Battery · Sensor · TH · X1 | I2C (SHT40) | V1.1.0 | [MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex) |
 | `MacSync-MBS-DRS-X1` | raw LoRa · Battery · Sensor · DRS · X1 | Digital (door reed) | V1.1.0 | [MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/STM32WLE5CBU6/MS-MBS-DRS-X1.hex) |
 | `MacSync-MPV-X1` | does not parse — see below | RS485 | V1.3.0 | [MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/STM32WLE5CBU6/MS-MPV-X1.hex) |
+| `MacSync-LPS-STD-X1` | LoRaWAN · externally Powered · Sensor · STD · X1 | RS485, Analog | V1.0.0 | [MS-LPS-STD-X1.hex](MacSync_LPO/MacSync_LPS_STD_X1/Application/STM32WLE5CBU6/MS-LPS-STD-X1.hex) |
 | `MacSync-MBS-TH-X1` (BLE build) | BLE build of an `M`-coded model | I2C (SHT40) | _unconfirmed_ | [BLE-MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/NrF52/BLE-MS-MBS-TH-X1.hex) |
 | `MacSync-MBS-DRS-X1` (BLE build) | BLE build of an `M`-coded model | Digital (door reed) | _unconfirmed_ | [BLE-MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/NrF52810/BLE-MS-MBS-DRS-X1.hex) |
 | `MacSync-MPV-X1` (BLE build) | does not parse — see below | RS485 | _unconfirmed_ | [BLE-MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/NrF52810/BLE-MS-MPV-X1.hex) |
+| `MacSync-LPS-STD-X1` (BLE build) | BLE bridge of the LoRaWAN model, name `MS-LPS-STD-X1` | RS485, Analog | _unconfirmed_ | [BLE-MS-LPS-STD-X1.hex](MacSync_LPO/MacSync_LPS_STD_X1/Application/NrF52810/BLE-MS-LPS-STD-X1.hex) |
 
 Application versions for the LoRa builds are the values reported by the firmware's own `DEVINFO` record. The nRF52 BLE builds embed no version string, so their versions are unconfirmed.
 
@@ -304,6 +315,7 @@ Hex files are named for the model, not the version:
 | 2026-09-04 | `MacSync-MBS-TH-X1` | V1.1.0 | Initial publication |
 | 2026-09-04 | `MacSync-MBS-DRS-X1` | V1.1.0 | Initial publication |
 | 2026-09-04 | BLE builds | _unconfirmed_ | Initial publication; versions pending confirmation |
+| 2026-10-21 | `MacSync-LPS-STD-X1` | V1.0.0 | Initial publication (STM32 bootloader + app merged, BLE SoftDevice + app merged). No JIG firmware yet; `hw_result` is empty until the JIG test is run |
 
 ## Flashing
 
