@@ -85,8 +85,7 @@ Macnman_Production_Firmware_Hex_Files/
     │       ├── NrF52810/
     │       │   └── nRF52810_JIG_LPO_Testing.hex
     │       └── STM32WLE5CBU6/
-    │           ├── LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex   # on the board
-    │           └── LoRa_STM32WLE_LPO_Jig_Boards_Testing.hex       # on the JIG board
+    │           └── LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex
     └── MS-MPV-X1/
         ├── hw_result.json
         ├── Application/
@@ -101,13 +100,12 @@ Macnman_Production_Firmware_Hex_Files/
                 └── LoRa__Jig_Boards_Testing_final.hex
 ```
 
-`MacSync_LPS_STD_X1/Testing/` holds everything the LPO JIG test needs:
+`MacSync_LPS_STD_X1/Testing/` holds the firmware flashed onto the board for the LPO JIG test:
 
 | File | Flashed onto | What it is |
 | --- | --- | --- |
 | `STM32WLE5CBU6/LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex` | the board's STM32 | test image, reports `DEVINFO=LORA,NODE,LPO_TEST_JIG,…`; also stores the board's own analog calibration for the shipping firmware |
 | `NrF52810/nRF52810_JIG_LPO_Testing.hex` | the board's nRF52810 | SoftDevice + test app, advertises `BLE_LPO_Testing_jig_V1` |
-| `STM32WLE5CBU6/LoRa_STM32WLE_LPO_Jig_Boards_Testing.hex` | the JIG board (LoRa-E5 mini) | runs the test and prints the `STEP` rows and `RESULT` JSON |
 
 The LBO models' `nRF52810_JIG_Testing.hex` advertises `BLE_Testing_jig_V1`, the name the LBO fixture looks for, so the two nRF test images are not interchangeable. Flash the shipping `Application/` firmware afterwards **without a full-chip erase**, or the board's analog calibration is lost.
 
@@ -332,7 +330,7 @@ Hex files are named for the model, not the version:
 | 2026-09-04 | `MacSync-MBS-DRS-X1` | V1.1.0 | Initial publication |
 | 2026-09-04 | BLE builds | _unconfirmed_ | Initial publication; versions pending confirmation |
 | 2026-10-21 | `MacSync-LPS-STD-X1` | V1.0.0 | Initial publication (STM32 bootloader + app merged, BLE SoftDevice + app merged). No JIG firmware yet; `hw_result` is empty until the JIG test is run |
-| 2026-10-26 | `MacSync-LPS-STD-X1` | JIG | JIG test firmware added under `Testing/`: board test images (STM32 `LPO_TEST_JIG`, nRF52810 `BLE_LPO_Testing_jig_V1`) and the JIG board firmware (`LoRa_STM32WLE_LPO_Jig_Boards_Testing.hex`, analog windows ±0.025 V / ±0.03 mA); `hw_result` from the LPO JIG run: `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test` pass. Application files unchanged (V1.0.0) |
+| 2026-10-26 | `MacSync-LPS-STD-X1` | JIG | JIG test firmware added under `Testing/`: board test images (STM32 `LPO_TEST_JIG`, nRF52810 `BLE_LPO_Testing_jig_V1`); JIG analog windows ±0.025 V / ±0.03 mA; `hw_result` from the LPO JIG run: `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test` pass. Application files unchanged (V1.0.0) |
 
 ## Flashing
 

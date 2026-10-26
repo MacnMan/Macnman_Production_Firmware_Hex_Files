@@ -6,8 +6,7 @@
     ],
     "testing": [
       "Testing/NrF52810/nRF52810_JIG_LPO_Testing.hex",
-      "Testing/STM32WLE5CBU6/LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex",
-      "Testing/STM32WLE5CBU6/LoRa_STM32WLE_LPO_Jig_Boards_Testing.hex"
+      "Testing/STM32WLE5CBU6/LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex"
     ]
   },
   "hw_result": {
