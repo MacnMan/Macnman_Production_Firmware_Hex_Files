@@ -4,7 +4,16 @@
       "Application/NrF52810/BLE-MS-LPS-STD-X1.hex",
       "Application/STM32WLE5CBU6/MS-LPS-STD-X1.hex"
     ],
-    "testing": []
+    "testing": [
+      "Testing/NrF52810/nRF52810_JIG_LPO_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex"
+    ]
   },
-  "hw_result": {}
+  "hw_result": {
+    "lora_rf": true,
+    "rs485": true,
+    "analog_v": true,
+    "analog_c": true,
+    "led_test": true
+  }
 }

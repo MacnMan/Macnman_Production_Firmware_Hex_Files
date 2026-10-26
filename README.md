@@ -76,11 +76,16 @@ Macnman_Production_Firmware_Hex_Files/
 └── MacSync_LPO/                              # LoRa, Power Operated
     ├── MacSync_LPS_STD_X1/                   # LoRaWAN build, RS485 + analog
     │   ├── hw_result.json
-    │   └── Application/
+    │   ├── Application/
+    │   │   ├── NrF52810/
+    │   │   │   └── BLE-MS-LPS-STD-X1.hex
+    │   │   └── STM32WLE5CBU6/
+    │   │       └── MS-LPS-STD-X1.hex
+    │   └── Testing/
     │       ├── NrF52810/
-    │       │   └── BLE-MS-LPS-STD-X1.hex
+    │       │   └── nRF52810_JIG_LPO_Testing.hex
     │       └── STM32WLE5CBU6/
-    │           └── MS-LPS-STD-X1.hex
+    │           └── LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex
     └── MS-MPV-X1/
         ├── hw_result.json
         ├── Application/
@@ -95,7 +100,7 @@ Macnman_Production_Firmware_Hex_Files/
                 └── LoRa__Jig_Boards_Testing_final.hex
 ```
 
-`MacSync_LPS_STD_X1` has no `Testing/` folder yet: no JIG firmware has been assigned to this board.
+`MacSync_LPS_STD_X1/Testing/` holds the LPO JIG firmware flashed onto the board for the fixture test: `LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex` on the STM32 (reports `DEVINFO=LORA,NODE,LPO_TEST_JIG,…`) and `nRF52810_JIG_LPO_Testing.hex` on the nRF52810 (SoftDevice + app, advertises `BLE_LPO_Testing_jig_V1`). The LBO models' `nRF52810_JIG_Testing.hex` advertises `BLE_Testing_jig_V1`, the name the LBO fixture looks for, so the two nRF test images are not interchangeable.
 
 Within each stage folder, firmware is separated by target MCU:
 
@@ -251,6 +256,8 @@ The `firmware` lists are correct — they are generated from the folder contents
 - **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board. The key should be absent, not `false`.
 - **`MS-MPV-X1` claims `rs485: false`** though its firmware reports `DEVINFO=LORA,NODE,RS485,…`. It has RS485, so the test should be present and its real result recorded.
 
+`MacSync_LPS_STD_X1` records only the five tests its JIG runs (`lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test`). The catalogue also calls for `pwr_in` (position 2 `P`) and `3volt_out`, but the LPO JIG does not measure either, so they are left out rather than written `false`; add them once the JIG tests them. Its `analog_v` / `analog_c` pass mean the board read the JIG's sources within ±0.01 V / ±0.03 mA after the JIG wrote the board's own calibration.
+
 Note also that each model builds for a BLE MCU as well as a LoRa one, but there is a single `hw_result` block per model and no BLE radio test in the catalogue. If the JIG tests the two MCUs separately, the file needs a way to express that.
 
 Fetch a result directly over raw HTTP:
@@ -316,6 +323,7 @@ Hex files are named for the model, not the version:
 | 2026-09-04 | `MacSync-MBS-DRS-X1` | V1.1.0 | Initial publication |
 | 2026-09-04 | BLE builds | _unconfirmed_ | Initial publication; versions pending confirmation |
 | 2026-10-21 | `MacSync-LPS-STD-X1` | V1.0.0 | Initial publication (STM32 bootloader + app merged, BLE SoftDevice + app merged). No JIG firmware yet; `hw_result` is empty until the JIG test is run |
+| 2026-10-26 | `MacSync-LPS-STD-X1` | JIG | JIG test firmware added under `Testing/` (STM32 `LPO_TEST_JIG` image, nRF52810 `BLE_LPO_Testing_jig_V1` image); `hw_result` from the LPO JIG run: `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test` pass. Application files unchanged (V1.0.0) |
 
 ## Flashing
 
