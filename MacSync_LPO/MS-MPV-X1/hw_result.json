@@ -10,16 +10,11 @@
     ]
   },
   "hw_result": {
-    "i2c": false,
+    "ble": true,
+    "lora_rf": true,
     "rs485": true,
-    "relay_test": false,
     "analog_v": false,
     "analog_c": false,
-    "3volt_out": false,
-    "pwr_out": false,
-    "pwr_in": true,
-    "led_test": true,
-    "capacitor_charge": false,
-    "lora_rf": true
+    "led_test": true
   }
 }
