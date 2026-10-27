@@ -93,11 +93,11 @@ Macnman_Production_Firmware_Hex_Files/
         │   │   └── BLE-MS-MPV-X1.hex
         │   └── STM32WLE5CBU6/
         │       └── MS-MPV-X1.hex
-        └── Testing/
-            ├── NrF52/
-            │   └── nRF52810_JIG_Testing.hex
+        └── Testing/                          # same LPO JIG images as LPS
+            ├── NrF52810/
+            │   └── nRF52810_JIG_LPO_Testing.hex
             └── STM32WLE5CBU6/
-                └── LoRa__Jig_Boards_Testing_final.hex
+                └── LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex
 ```
 
 `MacSync_LPS_STD_X1/Testing/` holds the firmware flashed onto the board for the LPO JIG test:
@@ -156,8 +156,7 @@ Folders are only visible on GitHub once they contain a committed file — an emp
 Each model has its own folder, and `MS-MPV-X1` sits under `MacSync_LPO` as its `P` code requires. Three points remain open — see [Naming exceptions to resolve](#naming-exceptions-to-resolve) for detail:
 
 - **`MS-MPV-X1/` is named inconsistently with its siblings.** The other model folders use the full family name with underscores (`MacSync_MBS_TH_X1`); this one uses the abbreviated, hyphenated file-name form. It should be `MacSync_MPV_X1/`.
-- **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` and `MS-MPV-X1/Testing/` use `NrF52`, while everywhere else uses `NrF52810` — including folders holding the same `nRF52810_JIG_Testing.hex`. Pick either the exact part number or the family and apply it everywhere.
-- **`MS-MPV-X1` carries older JIG firmware than the other models.** It still holds `LoRa__Jig_Boards_Testing_final.hex` and the earlier `nRF52810_JIG_Testing.hex`, where the others have moved to `LoRa_Jig_Testing_SHT40_Sensor.hex` and a newer nRF build. Confirm whether MPV should be updated too.
+- **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` uses `NrF52`, while everywhere else uses `NrF52810`. Pick either the exact part number or the family and apply it everywhere.
 - **`MacSync_LBS_TH_X1` hex files do not follow the naming convention.** `BLE_MS-LBS-TH-X1.hex` uses an underscore where the convention has a hyphen (`BLE-MS-…`), and `MacSync_LBS_TH_X1.hex` spells out the family with underscores instead of the `MS-LBS-TH-X1.hex` form used by every other model. See [file naming convention](#file-naming-convention).
 
 ## Hardware test results
@@ -266,7 +265,8 @@ The rest depend on what is fitted to the board — confirm against the schematic
 The `firmware` lists are correct — they are generated from the folder contents. The `hw_result` block is not: all three files carry the same ten-field sample. Each must be replaced with that board's real required key set and real measured values. Two problems are provable as they stand:
 
 - **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board. The key should be absent, not `false`.
-- **`MS-MPV-X1` claims `rs485: false`** though its firmware reports `DEVINFO=LORA,NODE,RS485,…`. It has RS485, so the test should be present and its real result recorded.
+
+`MS-MPV-X1` is tested on the LPO JIG with the same `Testing/` images as `MacSync_LPS_STD_X1`. It is an RS485 board with no analog inputs, so its file records `ble`, `lora_rf`, `rs485` and `led_test` only - no `analog_v` / `analog_c` (the JIG's analog rows for an MPV board do not apply).
 
 `MacSync_LPS_STD_X1` records only the six tests its JIG runs (`ble`, `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test`). The catalogue also calls for `pwr_in` (position 2 `P`) and `3volt_out`, but the LPO JIG does not measure either, so they are left out rather than written `false`; add them once the JIG tests them. Its `analog_v` / `analog_c` pass mean the board read 5 V and 10 V within ±0.025 V, and 10 mA and 20 mA within ±0.03 mA, after the JIG wrote the board's own calibration.
 
@@ -303,7 +303,6 @@ Application versions for the LoRa builds are the values reported by the firmware
 ### Naming exceptions to resolve
 
 - **`MPV` does not parse.** The third character `V` is neither `S` (Sensor) nor `D` (Datalogger), and the model has no payload segment between the code and the revision. Its firmware reports `DEVINFO=LORA,NODE,RS485,…`, so it is an RS485 device.
-- **`MPV` is `P` (externally powered) but sits under `MacSync_LBO`** (Battery Operated). Either the file is in the wrong folder or the name predates this convention.
 - **The BLE builds carry `M`-coded model numbers.** Position 1 of the code denotes LoRa, but these are nRF52 BLE images.
 - **Folder `MS-MPV-X1/` uses the hyphenated file-name form**, while sibling model folders use `MacSync_…_X1` with underscores.
 
@@ -337,6 +336,7 @@ Hex files are named for the model, not the version:
 | 2026-10-21 | `MacSync-LPS-STD-X1` | V1.0.0 | Initial publication (STM32 bootloader + app merged, BLE SoftDevice + app merged). No JIG firmware yet; `hw_result` is empty until the JIG test is run |
 | 2026-10-26 | `MacSync-LPS-STD-X1` | JIG | JIG test firmware added under `Testing/`: board test images (STM32 `LPO_TEST_JIG`, nRF52810 `BLE_LPO_Testing_jig_V1`); JIG analog windows ±0.025 V / ±0.03 mA; `hw_result` from the LPO JIG run: `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test` pass. Application files unchanged (V1.0.0) |
 | 2026-10-27 | all models | JIG | `ble` added to the test catalogue (always required). The JIG `RESULT` now starts `hw_result` with `"ble"`, and a board whose BLE does not link within 10 s fails it. `MacSync-LPS-STD-X1` records `"ble": true` |
+| 2026-10-27 | `MacSync-MPV-X1` | V1.3.0 | New BLE build (SoftDevice + app merged, name `MS-MPV-X1`); `Testing/` moved to the LPO JIG images; `hw_result`: `ble`, `lora_rf`, `rs485`, `led_test` (no analog on this board). STM32 file unchanged: V1.3.0, bootloader + app |
 
 ## Flashing
 

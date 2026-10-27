@@ -5,16 +5,14 @@
       "Application/STM32WLE5CBU6/MS-MPV-X1.hex"
     ],
     "testing": [
-      "Testing/NrF52/nRF52810_JIG_Testing.hex",
-      "Testing/STM32WLE5CBU6/LoRa__Jig_Boards_Testing_final.hex"
+      "Testing/NrF52810/nRF52810_JIG_LPO_Testing.hex",
+      "Testing/STM32WLE5CBU6/LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex"
     ]
   },
   "hw_result": {
     "ble": true,
     "lora_rf": true,
     "rs485": true,
-    "analog_v": false,
-    "analog_c": false,
     "led_test": true
   }
 }
