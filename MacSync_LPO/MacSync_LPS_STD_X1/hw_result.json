@@ -10,6 +10,7 @@
     ]
   },
   "hw_result": {
+    "ble": true,
     "lora_rf": true,
     "rs485": true,
     "analog_v": true,

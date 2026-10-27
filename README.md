@@ -177,6 +177,7 @@ Each model folder carries exactly one `hw_result.json`, recording the firmware i
     ]
   },
   "hw_result": {
+    "ble": true,
     "i2c": true,
     "3volt_out": true,
     "capacitor_charge": true,
@@ -221,6 +222,7 @@ The key set therefore **varies by model**. Consumers must not assume a fixed set
 
 | Field | Test | Required when |
 | --- | --- | --- |
+| `ble` | BLE link to the board's nRF52 - the JIG connects over BLE before every other test | Always — every board has a BLE bridge |
 | `lora_rf` | LoRa RF transmit / receive | Model code position 1 is `L` or `M` |
 | `i2c` | I2C bus communication (e.g. SHT40) | Board carries an I2C sensor |
 | `rs485` | RS485 / Modbus transceiver | Interface is RS485 |
@@ -239,15 +241,18 @@ Three of these are decided by the model number alone, so they need no judgement:
 - position 2 `B` → include `capacitor_charge`
 - position 2 `P` → include `pwr_in`
 
+Two apply to every board whatever its model: `ble` and `3volt_out`.
+
 The rest depend on what is fitted to the board — confirm against the schematic, not the model number.
 
 ### Worked example
 
-`MacSync-MBS-TH-X1` decodes to raw LoRa · Battery · Sensor · TH, on an I2C SHT40. Required tests: `lora_rf` (M), `capacitor_charge` (B), `i2c` (SHT40 fitted), `3volt_out` (always). It has no RS485, no relay and no analog inputs, so those five keys are omitted entirely:
+`MacSync-MBS-TH-X1` decodes to raw LoRa · Battery · Sensor · TH, on an I2C SHT40. Required tests: `ble` (always), `lora_rf` (M), `capacitor_charge` (B), `i2c` (SHT40 fitted), `3volt_out` (always). It has no RS485, no relay and no analog inputs, so those five keys are omitted entirely:
 
 ```json
 {
   "hw_result": {
+    "ble": true,
     "lora_rf": true,
     "capacitor_charge": true,
     "i2c": true,
@@ -263,9 +268,9 @@ The `firmware` lists are correct — they are generated from the folder contents
 - **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board. The key should be absent, not `false`.
 - **`MS-MPV-X1` claims `rs485: false`** though its firmware reports `DEVINFO=LORA,NODE,RS485,…`. It has RS485, so the test should be present and its real result recorded.
 
-`MacSync_LPS_STD_X1` records only the five tests its JIG runs (`lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test`). The catalogue also calls for `pwr_in` (position 2 `P`) and `3volt_out`, but the LPO JIG does not measure either, so they are left out rather than written `false`; add them once the JIG tests them. Its `analog_v` / `analog_c` pass mean the board read 5 V and 10 V within ±0.025 V, and 10 mA and 20 mA within ±0.03 mA, after the JIG wrote the board's own calibration.
+`MacSync_LPS_STD_X1` records only the six tests its JIG runs (`ble`, `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test`). The catalogue also calls for `pwr_in` (position 2 `P`) and `3volt_out`, but the LPO JIG does not measure either, so they are left out rather than written `false`; add them once the JIG tests them. Its `analog_v` / `analog_c` pass mean the board read 5 V and 10 V within ±0.025 V, and 10 mA and 20 mA within ±0.03 mA, after the JIG wrote the board's own calibration.
 
-Note also that each model builds for a BLE MCU as well as a LoRa one, but there is a single `hw_result` block per model and no BLE radio test in the catalogue. If the JIG tests the two MCUs separately, the file needs a way to express that.
+`ble` covers the BLE MCU. The JIG reaches the board through its nRF52 over BLE before anything else, and its `RESULT` JSON now carries `"ble": "OK"` / `"FAIL"` as the first `hw_result` entry. A board whose BLE does not link within 10 s fails `ble` (`STEP,0,FAIL,ble not connected in 10 s`) and the run ends there, so every other test of that board reads `FAIL` too. Only `MacSync_LPS_STD_X1` records `ble` so far; add it to the other models' files with their real result when those boards next run on the updated JIG.
 
 Fetch a result directly over raw HTTP:
 
@@ -331,6 +336,7 @@ Hex files are named for the model, not the version:
 | 2026-09-04 | BLE builds | _unconfirmed_ | Initial publication; versions pending confirmation |
 | 2026-10-21 | `MacSync-LPS-STD-X1` | V1.0.0 | Initial publication (STM32 bootloader + app merged, BLE SoftDevice + app merged). No JIG firmware yet; `hw_result` is empty until the JIG test is run |
 | 2026-10-26 | `MacSync-LPS-STD-X1` | JIG | JIG test firmware added under `Testing/`: board test images (STM32 `LPO_TEST_JIG`, nRF52810 `BLE_LPO_Testing_jig_V1`); JIG analog windows ±0.025 V / ±0.03 mA; `hw_result` from the LPO JIG run: `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test` pass. Application files unchanged (V1.0.0) |
+| 2026-10-27 | all models | JIG | `ble` added to the test catalogue (always required). The JIG `RESULT` now starts `hw_result` with `"ble"`, and a board whose BLE does not link within 10 s fails it. `MacSync-LPS-STD-X1` records `"ble": true` |
 
 ## Flashing
 
