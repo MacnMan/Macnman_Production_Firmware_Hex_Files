@@ -1,8 +1,8 @@
 {
   "firmware": {
     "application": [
-      "Application/NrF52810/BLE-MS-MBS-DRS-X1.hex",
-      "Application/STM32WLE5CBU6/MS-MBS-DRS-X1.hex"
+      "Application/NrF52810/BLE-MY-M1-DRS-X1.hex",
+      "Application/STM32WLE5CBU6/MY-M1-DRS-X1.hex"
     ],
     "testing": [
       "Testing/NrF52810/nRF52810_JIG_Testing.hex",

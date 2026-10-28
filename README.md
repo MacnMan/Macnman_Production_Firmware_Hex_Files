@@ -30,10 +30,13 @@ MY - L 1 D - TH - X1
 | `MY-L1-TH-X1` | `MacSync-LBS-TH-X1` | `MacSync_LBO/MY_L1_TH_X1` |
 | `MY-L3-CV-X1` | `MacSync-LPS-STD-X1` | `MacSync_LPO/MY_L3_CV_X1` |
 | `MS-L5-CT-X1` | `MS-LPC-ST-X1` (new here) | `MacSync_LPO/MS_L5_CT_X1` |
+| `MY-M1-TH-X1` | `MacSync-MBS-TH-X1` | `MacSync_LBO/MY_M1_TH_X1` |
+| `MY-M1-DRS-X1` | `MacSync-MBS-DRS-X1` | `MacSync_LBO/MY_M1_DRS_X1` |
+| `MY-M3-CV-X1` | `MacSync-MPV-X1` | `MacSync_LPO/MY_M3_CV_X1` |
 
 ### Older format
 
-The other models keep the older format below until they are renamed. Every older model number encodes its own metadata:
+Since 2026-10-28 every model in this repository uses the new format; the older format below is kept for reference (old tags and documents). Every older model number encodes its own metadata:
 
 ```
 MacSync - L B S - TH - X1
@@ -76,25 +79,25 @@ Macnman_Production_Firmware_Hex_Files/
 │   │       │   └── nRF52810_JIG_Testing.hex
 │   │       └── STM32WLE5CBU6/
 │   │           └── LoRa_Jig_Testing_SHT40_Sensor.hex
-│   ├── MacSync_MBS_TH_X1/
+│   ├── MY_M1_TH_X1/                          # raw LoRa (MacTalk) build (was MacSync_MBS_TH_X1)
 │   │   ├── hw_result.json                    # one per model
 │   │   ├── Application/                      # shipping firmware
 │   │   │   ├── NrF52/
-│   │   │   │   └── BLE-MS-MBS-TH-X1.hex
+│   │   │   │   └── BLE-MY-M1-TH-X1.hex
 │   │   │   └── STM32WLE5CBU6/
-│   │   │       └── MS-MBS-TH-X1.hex
+│   │   │       └── MY-M1-TH-X1.hex
 │   │   └── Testing/                          # JIG test firmware
 │   │       ├── NrF52810/
 │   │       │   └── nRF52810_JIG_Testing.hex
 │   │       └── STM32WLE5CBU6/
 │   │           └── LoRa_Jig_Testing_SHT40_Sensor.hex
-│   └── MacSync_MBS_DRS_X1/
+│   └── MY_M1_DRS_X1/                         # raw LoRa (MacTalk) build (was MacSync_MBS_DRS_X1)
 │       ├── hw_result.json
 │       ├── Application/
 │       │   ├── NrF52810/
-│       │   │   └── BLE-MS-MBS-DRS-X1.hex
+│       │   │   └── BLE-MY-M1-DRS-X1.hex
 │       │   └── STM32WLE5CBU6/
-│       │       └── MS-MBS-DRS-X1.hex
+│       │       └── MY-M1-DRS-X1.hex
 │       └── Testing/
 │           ├── NrF52810/
 │           │   └── nRF52810_JIG_Testing.hex
@@ -120,13 +123,13 @@ Macnman_Production_Firmware_Hex_Files/
     │       │   └── nRF52810_JIG_LPO_Testing.hex
     │       └── STM32WLE5CBU6/
     │           └── LoRa_LPO_Jig_Testing_RS485_Analog_Sensor.hex
-    └── MS-MPV-X1/
+    └── MY_M3_CV_X1/                          # raw LoRa (MacTalk) to RS485 Modbus (was MS-MPV-X1)
         ├── hw_result.json
         ├── Application/
         │   ├── NrF52810/
-        │   │   └── BLE-MS-MPV-X1.hex
+        │   │   └── BLE-MY-M3-CV-X1.hex
         │   └── STM32WLE5CBU6/
-        │       └── MS-MPV-X1.hex
+        │       └── MY-M3-CV-X1.hex
         └── Testing/                          # same LPO JIG images as LPS
             ├── NrF52810/
             │   └── nRF52810_JIG_LPO_Testing.hex
@@ -161,14 +164,14 @@ Firmware sits at a four-level path:
         |         |       |      |
         |         |       |      +-- MCU the build targets, e.g. NrF52810, STM32WLE5CBU6
         |         |       +--------- Application or Testing
-        |         +----------------- device model folder, e.g. MacSync_MBS_TH_X1
+        |         +----------------- device model folder, e.g. MY_M1_TH_X1
         +--------------------------- MacSync_LBO (battery) or MacSync_LPO (externally powered)
 ```
 
 | Level | Rule |
 | --- | --- |
 | `<power-class>` | New format: the power digit, `1` or `2` → `MacSync_LBO`, `3`, `4` or `5` → `MacSync_LPO`. Older format: **position 2** of the model code, `B` → `MacSync_LBO`, `P` → `MacSync_LPO`. Never create a third top-level folder. |
-| `<model>` | One folder per device model, named as the model number with `_` separators (e.g. `MacSync_MBS_TH_X1`). One model per folder — do not place another model's firmware here. |
+| `<model>` | One folder per device model, named as the model number with `_` separators (e.g. `MY_M1_TH_X1`). One model per folder — do not place another model's firmware here. |
 | `<stage>` | `Application` for the production firmware the device ships with; `Testing` for the JIG firmware used to bring the board up on the test fixture. |
 | `<mcu>` | One folder per target MCU. A device with two MCUs (radio + application) gets one folder each. |
 
@@ -188,11 +191,11 @@ Folders are only visible on GitHub once they contain a committed file — an emp
 
 #### Current deviations
 
-Each model has its own folder, and `MS-MPV-X1` sits under `MacSync_LPO` as its `P` code requires. Two points remain open — see [Naming exceptions to resolve](#naming-exceptions-to-resolve) for detail:
+Each model has its own folder. One point remains open:
 
-- **`MS-MPV-X1/` is named inconsistently with its siblings.** The other model folders use the full family name with underscores (`MacSync_MBS_TH_X1`); this one uses the abbreviated, hyphenated file-name form. It should be `MacSync_MPV_X1/`.
-- **MCU folder names are inconsistent.** `MacSync_MBS_TH_X1/Application/` uses `NrF52`, while everywhere else uses `NrF52810`. Pick either the exact part number or the family and apply it everywhere.
+- **MCU folder names are inconsistent.** `MY_M1_TH_X1/Application/` uses `NrF52`, while everywhere else uses `NrF52810`. Pick either the exact part number or the family and apply it everywhere.
 - Resolved 2026-10-28: the `MacSync_LBS_TH_X1` files (`BLE_MS-LBS-TH-X1.hex`, `MacSync_LBS_TH_X1.hex`) now follow the convention as `MY_L1_TH_X1/…/BLE-MY-L1-TH-X1.hex` and `MY-L1-TH-X1.hex`.
+- Resolved 2026-10-28: `MS-MPV-X1/` is now `MY_M3_CV_X1/` and is named like its siblings.
 
 ## Hardware test results
 
@@ -202,8 +205,8 @@ Each model folder carries exactly one `hw_result.json`, recording the firmware i
 {
   "firmware": {
     "application": [
-      "Application/NrF52/BLE-MS-MBS-TH-X1.hex",
-      "Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex"
+      "Application/NrF52/BLE-MY-M1-TH-X1.hex",
+      "Application/STM32WLE5CBU6/MY-M1-TH-X1.hex"
     ],
     "testing": [
       "Testing/NrF52810/nRF52810_JIG_Testing.hex",
@@ -275,13 +278,15 @@ Three of these are decided by the model number alone, so they need no judgement:
 - position 2 `B` → include `capacitor_charge`
 - position 2 `P` → include `pwr_in`
 
+In the new format the same three come from the communication letter (`L` / `M` → `lora_rf`) and the power digit (`1` / `2` → `capacitor_charge`, `3` - `5` → `pwr_in`).
+
 Two apply to every board whatever its model: `ble` and `3volt_out`.
 
 The rest depend on what is fitted to the board — confirm against the schematic, not the model number.
 
 ### Worked example
 
-`MacSync-MBS-TH-X1` decodes to raw LoRa · Battery · Sensor · TH, on an I2C SHT40. Required tests: `ble` (always), `lora_rf` (M), `capacitor_charge` (B), `i2c` (SHT40 fitted), `3volt_out` (always). It has no RS485, no relay and no analog inputs, so those five keys are omitted entirely:
+`MY-M1-TH-X1` (was `MacSync-MBS-TH-X1`) decodes to MacSync · MacTalk (raw LoRa) · Battery · no flash · TH, on an I2C SHT40. Required tests: `ble` (always), `lora_rf` (M), `capacitor_charge` (B), `i2c` (SHT40 fitted), `3volt_out` (always). It has no RS485, no relay and no analog inputs, so those five keys are omitted entirely:
 
 ```json
 {
@@ -299,9 +304,9 @@ The rest depend on what is fitted to the board — confirm against the schematic
 
 The `firmware` lists are correct — they are generated from the folder contents. The `hw_result` block is not: all three files carry the same ten-field sample. Each must be replaced with that board's real required key set and real measured values. Two problems are provable as they stand:
 
-- **`MacSync_MBS_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board. The key should be absent, not `false`.
+- **`MY_M1_TH_X1` claims `rs485: false`** though it is an I2C temperature/humidity board. The key should be absent, not `false`.
 
-`MS-MPV-X1` is tested on the LPO JIG with the same `Testing/` images as `MY_L3_CV_X1`. It is an RS485 board with no analog inputs, so its file records `ble`, `lora_rf`, `rs485` and `led_test` only - no `analog_v` / `analog_c` (the JIG's analog rows for an MPV board do not apply).
+`MY_M3_CV_X1` (was `MS-MPV-X1`) is tested on the LPO JIG with the same `Testing/` images as `MY_L3_CV_X1`. It is an RS485 board with no analog inputs, so its file records `ble`, `lora_rf`, `rs485` and `led_test` only - no `analog_v` / `analog_c` (the JIG's analog rows for an MPV board do not apply).
 
 `MY_L3_CV_X1` records only the six tests its JIG runs (`ble`, `lora_rf`, `rs485`, `analog_v`, `analog_c`, `led_test`). The catalogue also calls for `pwr_in` (position 2 `P`) and `3volt_out`, but the LPO JIG does not measure either, so they are left out rather than written `false`; add them once the JIG tests them. Its `analog_v` / `analog_c` pass mean the board read 5 V and 10 V within ±0.025 V, and 10 mA and 20 mA within ±0.03 mA, after the JIG wrote the board's own calibration.
 
@@ -326,20 +331,22 @@ https://raw.githubusercontent.com/MacnMan/Macnman_Production_Firmware_Hex_Files/
 | Model | Decoded | Interface | Application | Hex file |
 | --- | --- | --- | --- | --- |
 | `MY-L1-TH-X1` (was `MacSync-LBS-TH-X1`) | MacSync · LoRaWAN · Battery · no flash · TH · X1 | I2C (SHT40) | V1.0.0 | [MY-L1-TH-X1.hex](MacSync_LBO/MY_L1_TH_X1/Application/STM32WLE5CBU6/MY-L1-TH-X1.hex) |
-| `MacSync-MBS-TH-X1` | raw LoRa · Battery · Sensor · TH · X1 | I2C (SHT40) | V1.1.0 | [MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/STM32WLE5CBU6/MS-MBS-TH-X1.hex) |
-| `MacSync-MBS-DRS-X1` | raw LoRa · Battery · Sensor · DRS · X1 | Digital (door reed) | V1.1.0 | [MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/STM32WLE5CBU6/MS-MBS-DRS-X1.hex) |
-| `MacSync-MPV-X1` | does not parse — see below | RS485 | V1.3.0 | [MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/STM32WLE5CBU6/MS-MPV-X1.hex) |
+| `MY-M1-TH-X1` (was `MacSync-MBS-TH-X1`) | MacSync · MacTalk · Battery · no flash · TH · X1 | I2C (SHT40) | V1.1.0 | [MY-M1-TH-X1.hex](MacSync_LBO/MY_M1_TH_X1/Application/STM32WLE5CBU6/MY-M1-TH-X1.hex) |
+| `MY-M1-DRS-X1` (was `MacSync-MBS-DRS-X1`) | MacSync · MacTalk · Battery · no flash · DRS · X1 | Digital (door reed) | V1.1.0 | [MY-M1-DRS-X1.hex](MacSync_LBO/MY_M1_DRS_X1/Application/STM32WLE5CBU6/MY-M1-DRS-X1.hex) |
+| `MY-M3-CV-X1` (was `MacSync-MPV-X1`) | MacSync · MacTalk · DC 24 V · no flash · Converter · X1 | RS485 | V1.3.0 | [MY-M3-CV-X1.hex](MacSync_LPO/MY_M3_CV_X1/Application/STM32WLE5CBU6/MY-M3-CV-X1.hex) |
 | `MY-L3-CV-X1` (was `MacSync-LPS-STD-X1`) | MacSync · LoRaWAN · DC 24 V · no flash · Converter · X1 | RS485, Analog | V1.0.0 | [MY-L3-CV-X1.hex](MacSync_LPO/MY_L3_CV_X1/Application/STM32WLE5CBU6/MY-L3-CV-X1.hex) |
 | `MS-L5-CT-X1` (was `MS-LPC-ST-X1`) | MacSet · LoRaWAN · Mains (AC) · no flash · Controller · X1 | 2 relays, RS485, Analog | V1.0.0 | [MS-L5-CT-X1.hex](MacSync_LPO/MS_L5_CT_X1/Application/STM32WLE5CCU6/MS-L5-CT-X1.hex) |
-| `MacSync-MBS-TH-X1` (BLE build) | BLE build of an `M`-coded model | I2C (SHT40) | _unconfirmed_ | [BLE-MS-MBS-TH-X1.hex](MacSync_LBO/MacSync_MBS_TH_X1/Application/NrF52/BLE-MS-MBS-TH-X1.hex) |
-| `MacSync-MBS-DRS-X1` (BLE build) | BLE build of an `M`-coded model | Digital (door reed) | _unconfirmed_ | [BLE-MS-MBS-DRS-X1.hex](MacSync_LBO/MacSync_MBS_DRS_X1/Application/NrF52810/BLE-MS-MBS-DRS-X1.hex) |
-| `MacSync-MPV-X1` (BLE build) | does not parse — see below | RS485 | _unconfirmed_ | [BLE-MS-MPV-X1.hex](MacSync_LPO/MS-MPV-X1/Application/NrF52810/BLE-MS-MPV-X1.hex) |
+| `MY-M1-TH-X1` (BLE build) | BLE bridge of the model, name `MS-MBS-TH-X1` | I2C (SHT40) | _unconfirmed_ | [BLE-MY-M1-TH-X1.hex](MacSync_LBO/MY_M1_TH_X1/Application/NrF52/BLE-MY-M1-TH-X1.hex) |
+| `MY-M1-DRS-X1` (BLE build) | BLE bridge of the model, name `MS-MBS-DRS-X1` | Digital (door reed) | _unconfirmed_ | [BLE-MY-M1-DRS-X1.hex](MacSync_LBO/MY_M1_DRS_X1/Application/NrF52810/BLE-MY-M1-DRS-X1.hex) |
+| `MY-M3-CV-X1` (BLE build) | BLE bridge of the model, name `MS-MPV-X1` | RS485 | _unconfirmed_ | [BLE-MY-M3-CV-X1.hex](MacSync_LPO/MY_M3_CV_X1/Application/NrF52810/BLE-MY-M3-CV-X1.hex) |
 | `MY-L3-CV-X1` (BLE build) | BLE bridge of the LoRaWAN model, name `MS-LPS-STD-X1` | RS485, Analog | _unconfirmed_ | [BLE-MY-L3-CV-X1.hex](MacSync_LPO/MY_L3_CV_X1/Application/NrF52810/BLE-MY-L3-CV-X1.hex) |
 | `MS-L5-CT-X1` (BLE build) | BLE bridge of the controller, name `MS-LPC-ST-X1` | 2 relays, RS485, Analog | _unconfirmed_ | [BLE-MS-L5-CT-X1.hex](MacSync_LPO/MS_L5_CT_X1/Application/NrF52810/BLE-MS-L5-CT-X1.hex) |
 
 Application versions for the LoRa builds are the values reported by the firmware's own `DEVINFO` record. The nRF52 BLE builds embed no version string, so their versions are unconfirmed.
 
 ### Naming exceptions to resolve
+
+Resolved 2026-10-28 by the new model number nomenclature: `MPV` is now `MY-M3-CV-X1` (MacSync, MacTalk, DC 24 V, converter from LoRa to RS485 Modbus), the raw-LoRa models carry `M` = MacTalk in the communication position, and every model folder uses the same underscore form. The old notes, for reference:
 
 - **`MPV` does not parse.** The third character `V` is neither `S` (Sensor) nor `D` (Datalogger), and the model has no payload segment between the code and the revision. Its firmware reports `DEVINFO=LORA,NODE,RS485,…`, so it is an RS485 device.
 - **The BLE builds carry `M`-coded model numbers.** Position 1 of the code denotes LoRa, but these are nRF52 BLE images.
@@ -363,7 +370,7 @@ New-format models (since 2026-10-28) use the model number itself: `[BLE-]<model>
 2. Name it using the convention above.
 3. **Add or update `hw_result.json` in that folder.** This step is mandatory for every new model number — derive the required key set from the model code and the board, per [Rule: list only the tests that model requires](#rule-list-only-the-tests-that-model-requires), and record real measured values. A new model must never inherit another model's file unchanged.
 4. Validate the JSON parses and that its key set matches the tests that model actually has.
-5. Commit with a message stating the model and version, e.g. `Add MacSync-MPV-X1 firmware V1.3.0`.
+5. Commit with a message stating the model and version, e.g. `Add MY-M3-CV-X1 firmware V1.3.0`.
 6. Add a row to the release notes below.
 
 ## Release notes
@@ -379,6 +386,7 @@ New-format models (since 2026-10-28) use the model number itself: `[BLE-]<model>
 | 2026-10-27 | all models | JIG | `ble` added to the test catalogue (always required). The JIG `RESULT` now starts `hw_result` with `"ble"`, and a board whose BLE does not link within 10 s fails it. `MacSync-LPS-STD-X1` records `"ble": true` |
 | 2026-10-27 | `MacSync-MPV-X1` | V1.3.0 | New BLE build (SoftDevice + app merged, name `MS-MPV-X1`); `Testing/` moved to the LPO JIG images; `hw_result`: `ble`, `lora_rf`, `rs485`, `led_test` (no analog on this board). STM32 file unchanged: V1.3.0, bootloader + app |
 | 2026-10-28 | `MY-L1-TH-X1`, `MY-L3-CV-X1` | unchanged | Renamed to the new model number nomenclature: `MacSync_LBO/MacSync_LBS_TH_X1` → `MacSync_LBO/MY_L1_TH_X1`, `MacSync_LPO/MacSync_LPS_STD_X1` → `MacSync_LPO/MY_L3_CV_X1`; Application hex files renamed to `[BLE-]<model>.hex`, contents byte-identical. Testing files unchanged |
+| 2026-10-28 | `MY-M1-TH-X1`, `MY-M1-DRS-X1`, `MY-M3-CV-X1` | unchanged | Renamed to the new model number nomenclature: `MacSync_LBO/MacSync_MBS_TH_X1` → `MacSync_LBO/MY_M1_TH_X1`, `MacSync_LBO/MacSync_MBS_DRS_X1` → `MacSync_LBO/MY_M1_DRS_X1`, `MacSync_LPO/MS-MPV-X1` → `MacSync_LPO/MY_M3_CV_X1`; Application hex files renamed to `[BLE-]<model>.hex`, the STM32 files byte-identical (their app part matches a fresh build of the source). Fix: the TH model's BLE file was the LBS-TH bridge image (advertised `MS-LBS-TH-X1`); it is now the MBS-TH bridge image of 2026-10-15 (advertises `MS-MBS-TH-X1`, MD5 f983a032b729ccde5e73e8325681ac19). Testing files unchanged |
 | 2026-10-28 | `MS-L5-CT-X1` | V1.0.0 | Initial publication of the LoRaWAN relay controller (was MS-LPC-ST-X1): STM32 bootloader + app merged (MD5 28ee2e37c669d6216e3b8a5203957570), BLE SoftDevice + app merged (name `MS-LPC-ST-X1`, MD5 baf8b76a1c13dd114a2b99382b253b63). No JIG firmware yet; `hw_result` is empty |
 
 ## Flashing
