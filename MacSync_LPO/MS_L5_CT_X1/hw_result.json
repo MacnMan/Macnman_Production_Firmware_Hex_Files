@@ -1,0 +1,10 @@
+{
+  "firmware": {
+    "application": [
+      "Application/NrF52810/BLE-MS-L5-CT-X1.hex",
+      "Application/STM32WLE5CCU6/MS-L5-CT-X1.hex"
+    ],
+    "testing": []
+  },
+  "hw_result": {}
+}
